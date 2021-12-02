@@ -1,7 +1,8 @@
 package com.bridgelabz.addressbook;
-//Refactor Uc16
+//Uc17
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -9,8 +10,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
+
+import com.bridgelabz.employeepayroll.EmployeePayrollData;
 public class AddressBookDb {
 	Map<String, MultipleContacts> map;
+	PreparedStatement prepareStatement;
 	Scanner sc=new Scanner(System.in);
 	public void mapAddressBookRecords(Map<String, MultipleContacts> addressBookMap) {
 		map=addressBookMap;
@@ -33,8 +37,9 @@ public class AddressBookDb {
 	private int takeUserChoice() {
 		System.out.println("Database Operations:");
 		System.out.println("1.Display Address Book Record");
-		System.out.println("2.Exit");
-		System.out.println("Enter choice between 1 to 2");
+		System.out.println("2.Update Phone No.");
+		System.out.println("3.Exit");
+		System.out.println("Enter choice between 1 to 3");
 		int choice=sc.nextInt();
 		return choice;
 	}
@@ -42,6 +47,29 @@ public class AddressBookDb {
 		String sql="SELECT * FROM person;";
 		return this.getAddressDataUsingDB(sql);
 		}
+	public List<Contacts> getAddressBookData(String name){
+		List<Contacts> addressBookList=null;
+		if(this.prepareStatement==null) {
+			this.prepareStatementForAddressBookData();
+		}
+		try {
+			prepareStatement.setString(1,name);
+			ResultSet resultSet=prepareStatement.executeQuery();
+			addressBookList=this.getAddressBookData(resultSet);
+		} catch(SQLException e) {
+			e.printStackTrace();
+		}
+		return addressBookList;
+	}
+	private void prepareStatementForAddressBookData() {
+		try {
+			Connection connection=this.getConnection();
+			String sql="SELECT * FROM person WHERE name=?";
+			prepareStatement=connection.prepareStatement(sql);
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
 	private List<Contacts> getAddressDataUsingDB(String sql) {
 		List<Contacts> addressBookList=new ArrayList<>();
 		try (Connection connection=this.getConnection();){
@@ -77,5 +105,15 @@ public class AddressBookDb {
 		con=DriverManager.getConnection(jdbcUrl, userName, password);
 		System.out.println("Connection is successfull");
 		return con;
+	}
+	public int updatePhoneNum(String name,String phone_no) {
+		String sql=String.format("update person set phone_no='%s' where first_name='%s';",phone_no,name);
+		try (Connection connection=this.getConnection();){
+			Statement statement=connection.createStatement();
+			return statement.executeUpdate(sql);
+		} catch(SQLException e) {
+			e.printStackTrace();
+		}
+		return 0;
 	}
 }

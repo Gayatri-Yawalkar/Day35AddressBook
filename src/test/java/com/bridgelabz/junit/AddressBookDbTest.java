@@ -1,5 +1,5 @@
 package com.bridgelabz.junit;
-//Refactor Uc16
+//Uc17
 import static org.junit.Assert.assertEquals;
 import java.util.List;
 import org.junit.Test;
@@ -11,5 +11,11 @@ public class AddressBookDbTest {
 		AddressBookDb addressBookDb=new AddressBookDb();
 		List<Contacts> addressBookList=addressBookDb.readRecordsFromDatabase();
 		assertEquals(1,addressBookList.size());
+	}
+	@Test
+	public void givenNewPhoneNumForPerson_whenUpdated_shouldSyncWithDb() {
+		AddressBookDb addressBookDb=new AddressBookDb();
+		int result=addressBookDb.updatePhoneNum("Gayo","7453628960");
+		assertEquals(1,result);
 	}
 }
