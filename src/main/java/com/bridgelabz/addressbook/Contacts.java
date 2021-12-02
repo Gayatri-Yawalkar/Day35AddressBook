@@ -1,4 +1,7 @@
 package com.bridgelabz.addressbook;
+
+import java.time.LocalDate;
+
 public class Contacts {
 	public Integer id;
 	public String name;
@@ -8,7 +11,8 @@ public class Contacts {
 	public String zip;
 	public String phoneNum;
 	public String email;
-	public Contacts(Integer id,String firstLastName,String address,String city,String state,String zip,String phoneNum,String email) {
+	public LocalDate date;
+	public Contacts(String firstLastName,String address,String city,String state,String zip,String phoneNum,String email) {
 		this.address=address;
 		this.city=city;
 		this.state=state;
@@ -19,6 +23,10 @@ public class Contacts {
 		this.name=name;
 		this.phoneNum=phoneNum;
 		this.email=email;
+	}
+	public Contacts(int id, String name, String phoneNum, String email,LocalDate date) {
+		this(id,name,phoneNum,email);
+		this.date=date;
 	}
 	public String getFirstLastName() {
 		return name;

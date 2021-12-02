@@ -1,5 +1,5 @@
 package com.bridgelabz.junit;
-//Uc19
+//Uc20
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import java.time.LocalDate;
@@ -36,5 +36,11 @@ public class AddressBookDbTest {
 		AddressBookDb addressBookDb=new AddressBookDb();
 		Map<String,Integer> count=addressBookDb.getCountByCityAndState("city");
 		assertTrue(count.get("akola").equals(1) && count.get("pune").equals(1));
+	}
+	@Test
+	public void givenNewPersonData_whenAdded_shouldAddedToTableAndSyncWithDb() {
+		AddressBookDb addressBookDb=new AddressBookDb();
+		int result=addressBookDb.addNewPersonToDb("Nikhil","Station Road","Nagpur","Mahrashtra","444005","8765329031","n@gmail.com",LocalDate.now());
+		assertEquals(1,result);
 	}
 }

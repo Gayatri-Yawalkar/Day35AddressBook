@@ -1,5 +1,5 @@
 package com.bridgelabz.addressbook;
-//Uc19
+//Uc20
 import java.sql.Connection;
 import java.sql.Date;
 import java.sql.DriverManager;
@@ -45,6 +45,67 @@ public class AddressBookDb {
 		System.out.println("Enter choice between 1 to 3");
 		int choice=sc.nextInt();
 		return choice;
+	}
+	public int addNewPersonToDb(String firstLastName,String address,String city,String state,String zip,String phoneNum,String email,LocalDate date) {
+		int personId=-1;
+		int rowAffected=-1;
+		Connection connection=null;
+		Contacts contacts=null;
+		try {
+			connection=this.getConnection();
+			connection.setAutoCommit(false);
+		} catch(SQLException e) {
+			e.printStackTrace();
+		}
+		try(Statement statement=connection.createStatement()) {
+			String sql=String.format("INSERT INTO person(first_name,phone_no,email,insertion_date)"+
+					   "VALUES('%s','%s','%s','%s');",firstLastName,phoneNum,email,Date.valueOf(date));
+			rowAffected=statement.executeUpdate(sql,statement.RETURN_GENERATED_KEYS);
+			if(rowAffected==1) {
+				ResultSet resultSet=statement.getGeneratedKeys();
+				if(resultSet.next()) {
+					personId=resultSet.getInt(1);
+					System.out.println("Person Id="+personId);
+				}
+			}
+		} catch(SQLException e) {
+			e.printStackTrace();
+			try {
+				connection.rollback();
+				return rowAffected;
+			} catch (SQLException e1) {
+				e1.printStackTrace();
+			}
+		}
+		try(Statement statement=connection.createStatement()) {
+			String sql=String.format("INSERT INTO address_details"+
+					    "(id,address,city,state,zip) VALUES"+
+					    "(%d,'%s','%s','%s','%s');",personId,address,city,state,zip);
+			rowAffected=statement.executeUpdate(sql);
+		} catch (SQLException e) {
+			e.printStackTrace();
+			try {
+				connection.rollback();
+				return rowAffected;
+			} catch (SQLException e1) {
+				e1.printStackTrace();
+			}
+		} 
+		try {
+			connection.commit();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		finally {
+			if(connection!=null) {
+				try {
+					connection.close();
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+		return rowAffected;
 	}
 	public List<Contacts> readRecordsFromDatabase() {
 		String sql="SELECT * FROM person;";
