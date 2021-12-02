@@ -1,5 +1,5 @@
 package com.bridgelabz.addressbook;
-//Uc18
+//Uc19
 import java.sql.Connection;
 import java.sql.Date;
 import java.sql.DriverManager;
@@ -9,6 +9,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
@@ -112,6 +113,34 @@ public class AddressBookDb {
 		String sql=String.format("SELECT * FROM person WHERE insertion_date BETWEEN '%s' AND '%s';",
 								  Date.valueOf(startDate),Date.valueOf(endDate));
 		return this.getAddressDataUsingDB(sql);
+	}
+	public Map<String,Integer> getCountByCityAndState(String choice){
+		String sql=null;
+		if(choice.equalsIgnoreCase("city")) {
+			sql="select city,count(city) from address_details group by city;";
+		} else if(choice.equalsIgnoreCase("state")) {
+			sql="select state,count(state) from address_details group by state;";
+		} else {
+			System.out.println("You have Entered wrong choice");
+		}
+		Map<String,Integer> countMap=new HashMap<>();
+		try (Connection connection=this.getConnection();){
+			Statement statement=connection.createStatement();
+			ResultSet resultSet=null;
+			if(sql!=null) {
+				resultSet=statement.executeQuery(sql);
+			}
+			if(resultSet!=null) {
+				while(resultSet.next()) {
+					String cityOrState=resultSet.getString(1);
+					Integer count=resultSet.getInt(2);
+					countMap.put(cityOrState,count);
+				}
+			}
+		} catch(SQLException e) {
+			e.printStackTrace();
+		}
+		return countMap;
 	}
 	public int updatePhoneNum(String name,String phone_no) {
 		String sql=String.format("update person set phone_no='%s' where first_name='%s';",phone_no,name);
