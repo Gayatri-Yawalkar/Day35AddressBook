@@ -1,11 +1,13 @@
 package com.bridgelabz.addressbook;
-//Uc17
+//Uc18
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -105,6 +107,11 @@ public class AddressBookDb {
 		con=DriverManager.getConnection(jdbcUrl, userName, password);
 		System.out.println("Connection is successfull");
 		return con;
+	}
+	public List<Contacts> getAddressBookDataWithinDateRange(LocalDate startDate, LocalDate endDate) {
+		String sql=String.format("SELECT * FROM person WHERE insertion_date BETWEEN '%s' AND '%s';",
+								  Date.valueOf(startDate),Date.valueOf(endDate));
+		return this.getAddressDataUsingDB(sql);
 	}
 	public int updatePhoneNum(String name,String phone_no) {
 		String sql=String.format("update person set phone_no='%s' where first_name='%s';",phone_no,name);
